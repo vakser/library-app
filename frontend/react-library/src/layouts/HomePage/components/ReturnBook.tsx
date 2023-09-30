@@ -39,6 +39,21 @@ export const ReturnBook = () => {
         })
     }, []);
 
+    if (isLoading) {
+        return (
+            <div className='container m-5'>
+                <p>Loading...</p>
+            </div>
+        )
+    }
+    if (httpError) {
+        return (
+            <div className='container m-5'>
+                <p>{httpError}</p>
+            </div>
+        )
+    }
+
     return (
         <div className='col-xs-6 col-sm-6 col-md-4 col-lg-3 mb-3'>
             <div className='text-center'>
