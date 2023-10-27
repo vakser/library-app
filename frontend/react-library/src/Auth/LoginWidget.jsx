@@ -8,15 +8,12 @@ const LoginWidget = ({config}) => {
     const onSuccess = (tokens) => {
         oktaAuth.handleLoginRedirect(tokens);
     };
-
     const onError = (err) => {
         console.log('Sign in error: ', err);
     }
-
     if (!authState) {
         return (<SpinnerLoading/>);
     }
-
     return authState.isAuthenticated ?
         <Redirect to={{pathname: '/'}}/>
         :
