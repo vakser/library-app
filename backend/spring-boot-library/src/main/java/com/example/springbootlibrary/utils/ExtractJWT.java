@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ExtractJWT {
-    public static String payloadJWTExtraction(String token) {
+    public static String payloadJWTExtraction(String token, String extraction) {
         token = token.replace("Bearer ", "");
         String[] chunks = token.split("\\.");
         Base64.Decoder decoder = Base64.getUrlDecoder();
@@ -14,7 +14,7 @@ public class ExtractJWT {
         Map<String, String> map = new HashMap<>();
         for (String entry : entries) {
             String[] keyValue = entry.split(":");
-            if (keyValue[0].equals("\"sub\"")) {
+            if (keyValue[0].equals(extraction)) {
                 int remove = 1;
                 if (keyValue[1].endsWith("}")) {
                     remove = 2;
@@ -24,8 +24,8 @@ public class ExtractJWT {
                 map.put(keyValue[0], keyValue[1]);
             }
         }
-        if (map.containsKey("\"sub\"")) {
-            return map.get("\"sub\"");
+        if (map.containsKey(extraction)) {
+            return map.get(extraction);
         }
         return null;
     }
