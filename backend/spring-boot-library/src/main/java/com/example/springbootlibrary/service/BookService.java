@@ -4,11 +4,14 @@ import com.example.springbootlibrary.dao.BookRepository;
 import com.example.springbootlibrary.dao.CheckoutRepository;
 import com.example.springbootlibrary.entity.Book;
 import com.example.springbootlibrary.entity.Checkout;
+import com.example.springbootlibrary.responsemodels.ShelfCurrentLoansResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional
@@ -41,5 +44,28 @@ public class BookService {
 
     public int currentLoansCount(String userEmail) {
         return checkoutRepository.findBooksByUserEmail(userEmail).size();
+    }
+
+    public List<ShelfCurrentLoansResponse> currentLoans(String userEmail) throws Exception {
+        List<ShelfCurrentLoansResponse> shelfCurrentLoansResponses = new ArrayList<>();
+        List<Checkout> checkoutList = checkoutRepository.findBooksByUserEmail(userEmail);
+        List<Long> bookIdList = new ArrayList<>();
+        for (Checkout i : checkoutList) {
+            bookIdList.add(i.getBookId());
+        }
+        List<Book> books = bookRepository.findBooksByBookIds(bookIdList);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        for (Book book : books) {
+            Optional<Checkout> checkout = checkoutList.stream()
+                    .filter(x -> Objects.equals(x.getBookId(), book.getId())).findFirst();
+            if (checkout.isPresent()) {
+                Date date1 = sdf.parse(checkout.get().getReturnDate());
+                Date date2 = sdf.parse(LocalDate.now().toString());
+                TimeUnit time = TimeUnit.DAYS;
+                long differenceInTime = time.convert(date1.getTime() - date2.getTime(), TimeUnit.MILLISECONDS);
+                shelfCurrentLoansResponses.add(new ShelfCurrentLoansResponse(book, (int) differenceInTime));
+            }
+        }
+        return shelfCurrentLoansResponses;
     }
 }
