@@ -16,8 +16,8 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Transactional
 public class BookService {
-    private BookRepository bookRepository;
-    private CheckoutRepository checkoutRepository;
+    private final BookRepository bookRepository;
+    private final CheckoutRepository checkoutRepository;
 
     public BookService(BookRepository bookRepository, CheckoutRepository checkoutRepository) {
         this.bookRepository = bookRepository;
@@ -78,5 +78,19 @@ public class BookService {
         book.get().setCopiesAvailable(book.get().getCopiesAvailable() + 1);
         bookRepository.save(book.get());
         checkoutRepository.deleteById(validateCheckout.getId());
+    }
+
+    public void renewLoan(String userEmail, Long bookId) throws Exception {
+        Checkout validateCheckout = checkoutRepository.findByUserEmailAndBookId(userEmail, bookId);
+        if (validateCheckout == null) {
+            throw new Exception("Book does not exist or not checked out by user");
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date date1 = sdf.parse(validateCheckout.getReturnDate());
+        Date date2 = sdf.parse(LocalDate.now().toString());
+        if (date1.compareTo(date2) > 0 || date1.compareTo(date2) == 0) {
+            validateCheckout.setReturnDate(LocalDate.now().plusDays(7).toString());
+            checkoutRepository.save(validateCheckout);
+        }
     }
 }
