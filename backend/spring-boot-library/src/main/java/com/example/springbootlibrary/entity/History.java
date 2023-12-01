@@ -24,7 +24,7 @@ public class History {
     private String author;
     @Column(name = "description")
     private String description;
-    @Column(name = "image")
+    @Column(name = "img")
     private String img;
 
     public History() {}
