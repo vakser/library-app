@@ -1,9 +1,17 @@
 import React, { useState } from "react";
 import MessageModel from "../../../models/MessageModel";
 
-export const AdminMessage: React.FC<{ message: MessageModel }> = (props, key) => {
+export const AdminMessage: React.FC<{ message: MessageModel, submitResponseToQuestion: any }> = (props, key) => {
     const [displayWarning, setDisplayWarning] = useState(false);
     const [response, setResponse] = useState('');
+    function submitBtn() {
+        if (props.message.id !== null && response !== '') {
+            props.submitResponseToQuestion(props.message.id, response);
+            setDisplayWarning(false);
+        } else {
+            setDisplayWarning(true);
+        }
+    }
     return (
         <div key={props.message.id}>
             <div className='card mt-2 shadow p-3 bg-body rounded'>
@@ -25,7 +33,7 @@ export const AdminMessage: React.FC<{ message: MessageModel }> = (props, key) =>
                                       onChange={e => setResponse(e.target.value)} value={response}></textarea>
                         </div>
                         <div>
-                            <button type='button' className='btn btn-primary mt-3'>Submit Response</button>
+                            <button type='button' className='btn btn-primary mt-3' onClick={submitBtn}>Submit Response</button>
                         </div>
                     </form>
                 </div>
