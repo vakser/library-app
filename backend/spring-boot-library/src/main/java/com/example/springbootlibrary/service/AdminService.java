@@ -1,6 +1,8 @@
 package com.example.springbootlibrary.service;
 
 import com.example.springbootlibrary.dao.BookRepository;
+import com.example.springbootlibrary.dao.CheckoutRepository;
+import com.example.springbootlibrary.dao.ReviewRepository;
 import com.example.springbootlibrary.entity.Book;
 import com.example.springbootlibrary.requestmodels.AddBookRequest;
 import org.springframework.stereotype.Service;
@@ -12,9 +14,13 @@ import java.util.Optional;
 @Transactional
 public class AdminService {
     private final BookRepository bookRepository;
+    private final ReviewRepository reviewRepository;
+    private final CheckoutRepository checkoutRepository;
 
-    public AdminService(BookRepository bookRepository) {
+    public AdminService(BookRepository bookRepository, ReviewRepository reviewRepository, CheckoutRepository checkoutRepository) {
         this.bookRepository = bookRepository;
+        this.reviewRepository = reviewRepository;
+        this.checkoutRepository = checkoutRepository;
     }
 
     public void increaseBookQuantity(Long bookId) throws Exception {
@@ -47,5 +53,15 @@ public class AdminService {
         book.setCategory(addBookRequest.getCategory());
         book.setImg(addBookRequest.getImg());
         bookRepository.save(book);
+    }
+
+    public void deleteBook(Long bookId) throws Exception {
+        Optional<Book> book = bookRepository.findById(bookId);
+        if (book.isEmpty()) {
+            throw new Exception("Book not found");
+        }
+        bookRepository.delete(book.get());
+        checkoutRepository.deleteAllByBookId(bookId);
+        reviewRepository.deleteAllByBookId(bookId);
     }
 }
