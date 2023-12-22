@@ -5,20 +5,15 @@ import lombok.Data;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "checkout")
+@Table
 @Data
 public class Checkout {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
-    @Column(name = "user_email")
     private String userEmail;
-    @Column(name = "checkout_date")
     private String checkoutDate;
-    @Column(name = "return_date")
     private String returnDate;
-    @Column(name = "book_id")
     private Long bookId;
 
     public Checkout() {}
